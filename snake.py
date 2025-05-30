@@ -3,22 +3,24 @@ import time
 
 
 def game_loop(window):
-    window.addstr(f'Aperte alguma tecla para iniciar o jogo...')
+    personagem = [10, 15]
+    window.addch(personagem[0], personagem[1], curses.ACS_DIAMOND)
     while True:
         window.timeout(1000)  # Tempo de espera em milissegundos
         char = window.getch()
         window.clear()
         match char:
             case curses.KEY_UP:
-                window.addstr('Mover para cima')
+                personagem[0] -= 1
             case curses.KEY_DOWN:
-                window.addstr('Mover para baixo')
+                personagem[0] += 1
             case curses.KEY_LEFT:
-                window.addstr('Mover para esquerda')
+                personagem[1] -= 1
             case curses.KEY_RIGHT:
-                window.addstr('Mover para direita')
-            case _:
-                window.addstr(f'Não mover')
+                personagem[1] += 1
+            case _: # Not key pressed or not a valid key
+                pass
+        window.addch(personagem[0], personagem[1], curses.ACS_DIAMOND)
 
 if __name__ == "__main__":
     curses.wrapper(game_loop)
