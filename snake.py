@@ -23,6 +23,8 @@ def game_loop(window):
         direction = get_new_direction(window=window, timeout=1000)
         if direction is None:
             direction = current_direction
+        if direction_is_opposite(direction=direction, current_direction=current_direction):
+            direction = current_direction
         move_snake(snake=snake, direction=direction, snake_ate_fruit=snake_ate_fruit)
         if snake_hit_border(snake=snake, window=window):
             return
@@ -34,6 +36,19 @@ def game_loop(window):
         else:
             snake_ate_fruit = False         
         current_direction = direction
+
+
+def direction_is_opposite(direction, current_direction):
+    match direction:
+        case curses.KEY_UP:
+            return current_direction == curses.KEY_DOWN
+        case curses.KEY_LEFT:
+            return current_direction == curses.KEY_RIGHT
+        case curses.KEY_DOWN:
+            return current_direction == curses.KEY_UP
+        case curses.KEY_RIGHT:
+            return current_direction == curses.KEY_LEFT
+
 
 def get_new_fruit(window):
     height, width = window.getmaxyx() #get height and width of the window
