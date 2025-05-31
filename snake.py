@@ -5,28 +5,46 @@ import time
 def game_loop(window):
     #Initial setup
     curses.curs_set(0) #hidden cursor
-    personagem = [10, 15]
+    snake = [
+        [10, 15],
+        [9, 15],
+        [8, 15],
+        [7, 15],
+
+    ]  # Initial position of the snake
     current_direction = curses.KEY_DOWN  # Initial direction
 
     while True:
         draw_screen(window=window)
-        draw_actor(actor=personagem, window=window)
+        draw_snake(snake=snake, window=window)
         direction = get_new_direction(window=window, timeout=100)
         if direction is None:
             direction = current_direction
-        move_actor(actor=personagem, direction=direction)
-        if actor_hit_border(actor=personagem, window=window):
+        move_snake(snake=snake, direction=direction)
+        if snake_hit_border(snake=snake, window=window):
             return
         current_direction = direction
         
+def snake_hit_border(snake, window):
+    head = snake[0]  # Get the head of the snake
+    return actor_hit_border(actor=head, window=window)  # Check if the head hits the border
+
 
 def draw_screen(window):
     window.clear()
     window.border(0)  # Draw border
 
 
-def draw_actor(actor, window):
-    window.addch(actor[0], actor[1], curses.ACS_DIAMOND)  # Draw the actor at its position
+def draw_snake(snake, window):
+    head = snake[0]
+    draw_actor(actor=head, window=window, char='@')  # Draw the head of the snake
+    body = snake[1:]  # Get the body of the snake
+    for body_part in body:
+        draw_actor(actor=body_part, window=window, char='s')
+
+
+def draw_actor(actor, window, char):
+    window.addch(actor[0], actor[1], char)  # Draw the actor at its position
         
 
 def get_new_direction(window, timeout):
@@ -35,6 +53,14 @@ def get_new_direction(window, timeout):
     if direction in [curses.KEY_UP, curses.KEY_DOWN, curses.KEY_LEFT, curses.KEY_RIGHT]:
         return direction
     return None
+
+
+def move_snake(snake, direction):
+    head = snake[0].copy()  # Copy the head of the snake
+    move_actor(actor=head, direction=direction)  # Move the head in the specified direction
+    head[0] -= 1 # Move the head in the current direction
+    snake.insert(0, head)  # Insert the new head at the beginning of the snake
+    snake.pop()  # Remove the last segment of the snake to keep its length constant
 
 
 def move_actor(actor, direction):
