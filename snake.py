@@ -14,6 +14,7 @@ def game_loop(window):
     ]  # Initial position of the snake
     fruit = get_new_fruit(window=window)
     current_direction = curses.KEY_DOWN  # Initial direction
+    snake_ate_fruit = False
 
     while True:
         draw_screen(window=window)
@@ -22,11 +23,16 @@ def game_loop(window):
         direction = get_new_direction(window=window, timeout=1000)
         if direction is None:
             direction = current_direction
-        move_snake(snake=snake, direction=direction)
+        move_snake(snake=snake, direction=direction, snake_ate_fruit=snake_ate_fruit)
         if snake_hit_border(snake=snake, window=window):
             return
+        if snake_hit_itself(snake=snake):
+            return
         if snake_hit_fruit(snake=snake, fruit=fruit):
+            snake_ate_fruit = True
             fruit = get_new_fruit(window=window)
+        else:
+            snake_ate_fruit = False         
         current_direction = direction
 
 def get_new_fruit(window):
@@ -38,8 +44,16 @@ def snake_hit_border(snake, window):
     head = snake[0]  # Get the head of the snake
     return actor_hit_border(actor=head, window=window)  # Check if the head hits the border
 
+
 def snake_hit_fruit(snake, fruit):
     return fruit in snake # It will check if fruit belong to snake list
+
+
+def snake_hit_itself(snake):
+    head = snake[0]
+    body = snake[1:]
+    return head in body
+
 
 def draw_screen(window):
     window.clear()
@@ -66,11 +80,12 @@ def get_new_direction(window, timeout):
     return None
 
 
-def move_snake(snake, direction):
+def move_snake(snake, direction, snake_ate_fruit):
     head = snake[0].copy()  # Copy the head of the snake
     move_actor(actor=head, direction=direction)  # Move the head in the specified direction    
     snake.insert(0, head)  # Insert the new head at the beginning of the snake
-    snake.pop()  # Remove the last segment of the snake to keep its length constant
+    if not snake_ate_fruit:
+        snake.pop()  # Remove the last segment of the snake to keep its length constant
 
 
 def move_actor(actor, direction):
