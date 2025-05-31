@@ -3,12 +3,15 @@ import time
 
 
 def game_loop(window):
+    curses.curs_set(0) #hidden cursor
+    window.border(0) #no border
     personagem = [10, 15]
     window.addch(personagem[0], personagem[1], curses.ACS_DIAMOND)
     while True:
-        window.timeout(1000)  # Tempo de espera em milissegundos
+        window.timeout(1000)  # Waiting for 1 second
         char = window.getch()
         window.clear()
+        window.border(0)
         match char:
             case curses.KEY_UP:
                 personagem[0] -= 1
